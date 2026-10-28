@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0b0b" />
+    <title>Lash Empresária · Pare de pagar pra trabalhar</title>
+    <meta name="description" content="A calculadora que mostra o preço certo de cada procedimento de cílios, a partir dos seus custos reais." />
+    <meta property="og:title" content="Lash Empresária" />
+    <meta property="og:description" content="Descubra quanto custa cada aplicação sua e quanto cobrar para ter lucro de verdade." />
+    <meta property="og:image" content="/icone-512.png" />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+    <style>
+      /* Mesma identidade do app (src/estilos.css): preto e branco, Italiana + Jost, cantos retos. */
+      :root {
+        --surface: #ffffff;
+        --surface-alt: #f5f4f2;
+        --pearl: #e9e6e1;
+        --ink: #0b0b0b;
+        --ink-muted: #5c5a57;
+        --line: #d9d7d3;
+        --action: #0b0b0b;
+        --on-action: #ffffff;
+        --font-display: 'Italiana', 'Didot', 'Bodoni 72', Georgia, serif;
+        --font-sans: 'Jost', 'Futura', 'Century Gothic', system-ui, sans-serif;
+        --gutter: 20px;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--surface);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        font-weight: 300;
+        font-size: 17px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; }
+      .faixa { padding: 72px var(--gutter); }
+      .faixa--escura { background: var(--action); color: var(--on-action); }
+      .faixa--clara { background: var(--surface-alt); }
+      .caixa { max-width: 720px; margin: 0 auto; }
+
+      .eyebrow { font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase; font-weight: 400; margin: 0 0 16px; }
+      h1, h2, h3 { font-family: var(--font-display); font-weight: 400; margin: 0; text-wrap: balance; }
+      h1 { font-size: clamp(44px, 11vw, 76px); line-height: 1.02; letter-spacing: 0.01em; }
+      h2 { font-size: clamp(32px, 7vw, 46px); line-height: 1.1; letter-spacing: 0.02em; margin-bottom: 24px; }
+      h3 { font-size: 26px; line-height: 1.2; margin-bottom: 8px; }
+      p { margin: 0 0 16px; }
+      .apoio { font-size: 19px; color: var(--ink-muted); max-width: 34em; }
+      .faixa--escura .apoio { color: rgba(255, 255, 255, 0.75); }
+
+      .marca { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 28px var(--gutter) 0; text-align: center; }
+      .marca__nome { font-family: var(--font-display); font-size: 24px; letter-spacing: 0.04em; }
+      .marca__apoio { font-size: 9px; letter-spacing: 0.32em; text-transform: uppercase; }
+
+      .heroi { padding-top: 56px; text-align: left; }
+      .heroi .apoio { margin-top: 24px; }
+
+      .botao {
+        display: inline-block;
+        font-family: var(--font-sans);
+        font-size: 13px;
+        line-height: 20px;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        text-decoration: none;
+        text-align: center;
+        padding: 18px 28px;
+        background: var(--action);
+        color: var(--on-action);
+        border: 1px solid var(--action);
+        cursor: pointer;
+      }
+      .botao--claro { background: var(--on-action); color: var(--action); border-color: var(--on-action); }
+      .botao--bloco { display: block; width: 100%; }
+      .acao { margin-top: 32px; }
+      .acao small { display: block; margin-top: 12px; font-size: 13px; color: var(--ink-muted); }
+      .faixa--escura .acao small { color: rgba(255, 255, 255, 0.7); }
+
+      /* A conta que dói */
+      .conta { border-top: 1px solid currentColor; margin-top: 32px; }
+      .conta div { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); font-variant-numeric: tabular-nums; }
+      .conta span + span { white-space: nowrap; }
+      .conta .total { font-size: 22px; font-weight: 400; border-bottom: 0; }
+      .riscado { text-decoration: line-through; opacity: 0.6; }
+
+      .lista-numerada { list-style: none; padding: 0; margin: 32px 0 0; counter-reset: passo; display: grid; gap: 28px; }
+      .lista-numerada li { counter-increment: passo; display: grid; grid-template-columns: 56px 1fr; gap: 8px; }
+      .lista-numerada li::before { content: counter(passo, decimal-leading-zero); font-family: var(--font-display); font-size: 34px; line-height: 1; }
+      .lista-numerada p { color: var(--ink-muted); margin: 0; }
+
+      .grade { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 32px; }
+      .grade > div { background: var(--surface); padding: 24px; }
+      .grade p { color: var(--ink-muted); margin: 0; font-size: 16px; }
+      @media (min-width: 640px) { .grade { grid-template-columns: 1fr 1fr; } }
+
+      .citacao { font-family: var(--font-display); font-size: clamp(28px, 6vw, 38px); line-height: 1.2; margin: 0 0 24px; }
+
+      /* Oferta */
+      .planos { display: grid; gap: 16px; margin-top: 32px; }
+      @media (min-width: 640px) { .planos { grid-template-columns: 1fr 1fr; } }
+      .plano { border: 1px solid var(--line); padding: 28px 24px; display: flex; flex-direction: column; gap: 12px; background: var(--surface); }
+      .plano--destaque { border: 2px solid var(--ink); }
+      .plano__selo { align-self: flex-start; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; background: var(--ink); color: var(--on-action); padding: 4px 10px; }
+      .plano__nome { font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase; }
+      .plano__de { color: var(--ink-muted); font-size: 15px; }
+      .plano__preco { font-size: 52px; line-height: 1; font-weight: 300; font-variant-numeric: tabular-nums; }
+      .plano__preco small { font-size: 20px; }
+      .plano ul { margin: 8px 0 16px; padding-left: 18px; color: var(--ink-muted); font-size: 15px; }
+      .plano .botao { margin-top: auto; }
+
+      .garantia { display: grid; grid-template-columns: 72px 1fr; gap: 20px; align-items: start; margin-top: 40px; padding-top: 32px; border-top: 1px solid var(--line); }
+      .garantia__selo { width: 72px; height: 72px; border: 1px solid var(--ink); display: grid; place-items: center; text-align: center; font-family: var(--font-display); font-size: 28px; line-height: 0.9; }
+      .garantia__selo span { display: block; font-family: var(--font-sans); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; }
+
+      details { border-bottom: 1px solid var(--line); padding: 20px 0; }
+      details:first-of-type { border-top: 1px solid var(--line); }
+      summary { cursor: pointer; font-weight: 400; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+      summary::-webkit-details-marker { display: none; }
+      summary::after { content: '+'; font-size: 22px; line-height: 1; }
+      details[open] summary::after { content: '–'; }
+      details p { margin: 12px 0 0; color: var(--ink-muted); }
+
+      .rodape { padding: 40px var(--gutter) calc(40px + env(safe-area-inset-bottom, 0px)); text-align: center; font-size: 13px; color: var(--ink-muted); }
+      .rodape a { margin: 0 8px; }
+
+      /* Botão fixo no celular */
+      .fixo { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--surface); border-top: 1px solid var(--ink); transform: translateY(100%); transition: transform 0.25s; }
+      .fixo--visivel { transform: none; }
+      @media (min-width: 900px) { .fixo { display: none; } }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .fixo { transition: none; } }
+
+      /* cada fase do lançamento mostra só os seus blocos */
+      body:not([data-modo='captacao']) [data-so='captacao'],
+      body:not([data-modo='vendas']) [data-so='vendas'] { display: none !important; }
+    </style>
+  </head>
+  <body data-modo="captacao">
+    <!--
+      CONFIGURAÇÃO DA PÁGINA (editar aqui antes de cada fase do lançamento)
+      - modo "captacao": antes da aula. Os botões levam ao grupo de WhatsApp da aula.
+      - modo "vendas": carrinho aberto. Os botões levam ao checkout da Hotmart.
+    -->
+    <script>
+      window.CONFIG = {
+        modo: 'captacao',
+        dataAula: 'em breve', // ex.: 'terça, 25/11, às 20h'
+        linkGrupo: '', // link de convite do grupo de WhatsApp da aula
+        linkAnual: '', // checkout Hotmart do plano anual
+        linkVitalicio: '', // checkout Hotmart do plano vitalício
+      };
+    </script>
+
+    <header class="marca">
+      <span class="marca__nome">LASH EMPRESÁRIA</span>
+      <span class="marca__apoio">Precificação • para • lash designers</span>
+    </header>
+
+    <section class="faixa heroi">
+      <div class="caixa">
+        <p class="eyebrow">Para lash designers que já atendem</p>
+        <h1>Pare de pagar pra trabalhar.</h1>
+        <p class="apoio">
+          Descubra quanto custa de verdade cada aplicação sua e quanto cobrar para sobrar dinheiro no fim do mês. Em minutos, no seu celular.
+        </p>
+        <div class="acao">
+          <a class="botao" data-so="captacao" data-link="grupo" href="#">Quero participar da aula gratuita</a>
+          <a class="botao" data-so="vendas" href="#oferta">Quero calcular meus preços</a>
+          <small data-so="captacao">Aula ao vivo e gratuita: <span data-texto="dataAula">em breve</span></small>
+        </div>
+      </div>
+    </section>
+
+    <section class="faixa faixa--escura">
+      <div class="caixa">
+        <p class="eyebrow">A conta que ninguém faz</p>
+        <h2>"Eu cobrava R$ 125 e achava que sobravam R$ 75. Sobravam R$ 30."</h2>
+        <p class="apoio">
+          Volume moderado, 2 horas de cadeira. A planilha antiga dividia as contas do mês e o salário pelas 24 horas do dia, e não pelas horas de atendimento. Parecia que cada hora custava R$ 6. Custava R$ 28.
+        </p>
+        <div class="conta">
+          <div><span>Preço cobrado</span><span>R$ 125,00</span></div>
+          <div><span>Taxa da maquininha</span><span>− R$ 4,38</span></div>
+          <div><span>Material da aplicação</span><span>− R$ 33,63</span></div>
+          <div><span>2 horas × custo da hora (contas + salário)</span><span>− R$ 56,45</span></div>
+          <div class="total"><span>Lucro de verdade</span><span>R$ 30,54</span></div>
+        </div>
+        <p class="apoio" style="margin-top: 24px">
+          Com a conta certa, o preço sugerido para esse procedimento era <strong>R$ 140</strong>. Quantos atendimentos você já fez abaixo do preço sem saber?
+        </p>
+      </div>
+    </section>
+
+    <section class="faixa">
+      <div class="caixa">
+        <p class="eyebrow">O método</p>
+        <h2>Seu preço em 4 passos</h2>
+        <p class="apoio">O mesmo método usado no studio @studiojaclash, agora numa calculadora que faz a conta por você.</p>
+        <ol class="lista-numerada">
+          <li><div><h3>Material por aplicação</h3><p>Cola, fios, primer, fitas: o preço que você paga dividido por quantas aplicações rende.</p></div></li>
+          <li><div><h3>O custo da sua hora</h3><p>Suas contas do mês e o seu salário divididos pelas horas que você realmente atende, não pelas 24 horas do dia.</p></div></li>
+          <li><div><h3>O tempo de cada procedimento</h3><p>Um fox de 3 horas não pode custar o mesmo que um brasileiro de 1 hora e meia.</p></div></li>
+          <li><div><h3>Taxas e lucro</h3><p>Maquininha, imposto e a margem que você quer ganhar, por cima de tudo isso.</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="faixa faixa--clara">
+      <div class="caixa">
+        <p class="eyebrow">A calculadora</p>
+        <h2>Tudo o que você vê na tela</h2>
+        <div class="grade">
+          <div><h3>Preço sugerido</h3><p>Para cada procedimento, já arredondado para um valor fácil de cobrar.</p></div>
+          <div><h3>Preço mínimo</h3><p>O valor abaixo do qual você paga para trabalhar.</p></div>
+          <div><h3>Lucro ou prejuízo de hoje</h3><p>Coloque o preço que você cobra agora e veja quanto sobra de verdade.</p></div>
+          <div><h3>Meta do mês</h3><p>Quantos atendimentos pagam todas as suas contas e o seu salário.</p></div>
+        </div>
+        <p class="apoio" style="margin-top: 24px">Abre no navegador do celular, sem baixar nada. Seus números ficam salvos na sua conta, com e-mail e senha.</p>
+      </div>
+    </section>
+
+    <section class="faixa">
+      <div class="caixa">
+        <p class="eyebrow">Quem criou</p>
+        <p class="citacao">"Passei anos cobrando no chute. Quando fiz a conta, entendi por que trabalhava tanto e sobrava tão pouco."</p>
+        <p class="apoio">
+          Lash designer há 8 anos, dona do @studiojaclash e professora de cursos de extensão de cílios. A Lash Empresária nasceu da planilha que ela usa para precificar o próprio studio.
+        </p>
+        <p><a href="https://instagram.com/studiojaclash">@studiojaclash</a></p>
+      </div>
+    </section>
+
+    <section class="faixa faixa--clara" id="oferta" data-so="vendas">
+      <div class="caixa">
+        <p class="eyebrow">Turma fundadora</p>
+        <h2>Escolha seu acesso</h2>
+        <p class="apoio">Preço especial só durante o lançamento. Depois, os valores sobem.</p>
+        <div class="planos">
+          <div class="plano">
+            <span class="plano__nome">Anual</span>
+            <span class="plano__de">De <span class="riscado">R$ 47</span> por</span>
+            <span class="plano__preco"><small>R$</small> 37</span>
+            <ul>
+              <li>12 meses de acesso</li>
+              <li>Todos os procedimentos que quiser</li>
+              <li>Bônus da turma fundadora</li>
+            </ul>
+            <a class="botao botao--bloco" data-link="anual" href="#">Quero o anual</a>
+          </div>
+          <div class="plano plano--destaque">
+            <span class="plano__selo">Melhor custo</span>
+            <span class="plano__nome">Vitalício</span>
+            <span class="plano__de">De <span class="riscado">R$ 97</span> por</span>
+            <span class="plano__preco"><small>R$</small> 77</span>
+            <ul>
+              <li>Acesso para sempre</li>
+              <li>Todas as atualizações incluídas</li>
+              <li>Bônus da turma fundadora</li>
+            </ul>
+            <a class="botao botao--bloco" data-link="vitalicio" href="#">Quero o vitalício</a>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 40px">Bônus da turma fundadora</h3>
+        <ul class="apoio">
+          <li>Gravação da aula "Como precificar seus procedimentos"</li>
+          <li>Lista de materiais com preços médios e rendimento, já carregada no app</li>
+          <li>Grupo fechado de fundadoras por 30 dias, com live de tira-dúvidas</li>
+        </ul>
+
+        <div class="garantia">
+          <div class="garantia__selo">7<span>dias</span></div>
+          <div>
+            <h3>Garantia incondicional</h3>
+            <p class="apoio">Use a calculadora por 7 dias. Se não fizer sentido para você, devolvemos 100% do valor, sem perguntas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="faixa faixa--escura" data-so="captacao">
+      <div class="caixa">
+        <p class="eyebrow">Aula ao vivo e gratuita</p>
+        <h2>Como precificar seus procedimentos</h2>
+        <p class="apoio">
+          Ela faz a conta completa de um procedimento ao vivo, com números reais, e mostra os erros que fazem a lash cobrar barato. Entre no grupo para receber o link e os lembretes.
+        </p>
+        <div class="acao">
+          <a class="botao botao--claro" data-link="grupo" href="#">Entrar no grupo da aula</a>
+          <small><span data-texto="dataAula">em breve</span> · vagas no grupo limitadas</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="faixa">
+      <div class="caixa">
+        <p class="eyebrow">Dúvidas</p>
+        <h2>Perguntas frequentes</h2>
+        <details>
+          <summary>Preciso baixar algum aplicativo?</summary>
+          <p>Não. A calculadora abre no navegador do celular, e você pode salvar um atalho na tela inicial.</p>
+        </details>
+        <details>
+          <summary>Sou iniciante. Serve para mim?</summary>
+          <p>Serve, e é o melhor momento: você já começa cobrando o preço certo, em vez de corrigir depois.</p>
+        </details>
+        <details>
+          <summary>E se eu trocar de celular?</summary>
+          <p>Seus números ficam salvos na sua conta. É só entrar com seu e-mail e senha no aparelho novo.</p>
+        </details>
+        <details>
+          <summary>Não sou boa com números.</summary>
+          <p>Você só preenche o que já sabe: quanto paga nas contas, nos materiais e quantas horas atende. A calculadora faz o resto.</p>
+        </details>
+        <details>
+          <summary>Como recebo o acesso?</summary>
+          <p>Logo depois do pagamento você recebe um e-mail com o link. No primeiro acesso, você cria sua senha com o mesmo e-mail da compra.</p>
+        </details>
+        <details>
+          <summary>E se eu não gostar?</summary>
+          <p>Você tem 7 dias de garantia. Pede o reembolso e recebe 100% do valor de volta.</p>
+        </details>
+        <div class="acao">
+          <a class="botao" data-so="captacao" data-link="grupo" href="#">Quero participar da aula gratuita</a>
+          <a class="botao" data-so="vendas" href="#oferta">Ver os planos</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="rodape">
+      <p>Lash Empresária · uma marca criada por @studiojaclash</p>
+      <p><a href="/">Já comprei: entrar no app</a></p>
+    </footer>
+
+    <div class="fixo" aria-hidden="true">
+      <a class="botao botao--bloco" data-so="captacao" data-link="grupo" href="#" tabindex="-1">Entrar no grupo da aula</a>
+      <a class="botao botao--bloco" data-so="vendas" href="#oferta" tabindex="-1">Quero calcular meus preços</a>
+    </div>
+
+    <script>
+      (function () {
+        var c = window.CONFIG;
+        document.body.dataset.modo = c.modo;
+        var links = { grupo: c.linkGrupo, anual: c.linkAnual, vitalicio: c.linkVitalicio };
+        document.querySelectorAll('[data-link]').forEach(function (a) {
+          var url = links[a.dataset.link];
+          if (url) a.href = url;
+          else a.addEventListener('click', function (e) { e.preventDefault(); alert('Link em breve!'); });
+        });
+        document.querySelectorAll('[data-texto]').forEach(function (el) {
+          el.textContent = c[el.dataset.texto];
+        });
+        // botão fixo aparece depois que o primeiro botão sai da tela
+        var fixo = document.querySelector('.fixo');
+        var primeiro = document.querySelector('.heroi .acao');
+        if ('IntersectionObserver' in window) {
+          new IntersectionObserver(function (entradas) {
+            fixo.classList.toggle('fixo--visivel', !entradas[0].isIntersecting && entradas[0].boundingClientRect.top < 0);
+          }).observe(primeiro);
+        }
+      })();
+    </script>
+  </body>
+</html>

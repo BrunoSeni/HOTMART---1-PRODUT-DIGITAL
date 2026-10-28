@@ -16,6 +16,10 @@ O app abre com os números da planilha original como exemplo.
 
 Só entra quem comprou na Hotmart: login com e-mail e senha (Supabase Auth), liberação pelo webhook da Hotmart (`api/hotmart.ts`) e dados da calculadora salvos na conta. Sem as variáveis do Supabase, o app abre sem login. Configuração passo a passo em [`docs/configurar-acesso.md`](docs/configurar-acesso.md).
 
+## Página de vendas
+
+`public/vendas/index.html`, publicada em `/vendas`. É uma página estática, independente do app. No topo dela fica a configuração de cada fase do lançamento: `modo` (`captacao` antes da aula, com botões para o grupo de WhatsApp; `vendas` com o carrinho aberto, com botões para o checkout da Hotmart), a data da aula e os links. Quando houver domínio próprio, ela passa a ser a página principal do site (ver `docs/arquitetura.md`).
+
 ## Regras de cálculo
 
 Ver `src/lib/calculo.ts`. Em resumo:
