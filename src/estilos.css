@@ -490,6 +490,7 @@ a.botao {
   font-size: 13px;
   color: var(--ink-muted);
 }
+.lista .link-discreto,
 .conta .link-discreto {
   margin-top: 0;
 }

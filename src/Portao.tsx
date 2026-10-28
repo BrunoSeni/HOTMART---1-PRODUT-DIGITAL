@@ -1,6 +1,6 @@
 import { App } from './App';
 import { supabase, useAcesso } from './lib/acesso';
-import { Carregando, Entrar, ErroConexao, SemAcesso } from './telas/Entrar';
+import { Carregando, Entrar, ErroConexao, NovaSenha, SemAcesso } from './telas/Entrar';
 
 /** Só mostra a calculadora para quem comprou. Sem Supabase configurado, abre direto. */
 export function Portao() {
@@ -8,8 +8,9 @@ export function Portao() {
 }
 
 function ComLogin() {
-  const { situacao, erro } = useAcesso();
+  const { situacao, erro, novaSenha, senhaDefinida } = useAcesso();
   if (erro) return <ErroConexao />;
+  if (novaSenha) return <NovaSenha aoConcluir={senhaDefinida} />;
 
   switch (situacao.tipo) {
     case 'carregando':

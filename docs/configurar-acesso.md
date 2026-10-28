@@ -8,16 +8,16 @@ Ordem: Supabase → e-mail → Vercel → Hotmart → teste.
 
 1. Crie uma conta em supabase.com e um projeto novo. Região: **South America (São Paulo)**. Guarde a senha do banco num lugar seguro.
 2. No menu **SQL Editor**, clique em **New query**, cole o conteúdo de `supabase/001_acesso.sql` e clique em **Run**.
-3. Em **Authentication → Sign In / Providers**, confira que **Email** está ligado.
-4. Em **Authentication → Emails → Templates**, abra **Magic Link** e troque o texto por algo assim (o `{{ .Token }}` é o código):
+3. Em **Authentication → Sign In / Providers → Email**: deixe **Email** ligado, **Confirm email** ligado e o tamanho mínimo da senha em **8**.
+4. Em **Authentication → Emails → Templates**, traduza os dois e-mails que a compradora recebe:
 
-   - Assunto: `Seu código de acesso: {{ .Token }}`
-   - Corpo: `<p>Seu código para entrar na Lash Empresária é:</p><h2>{{ .Token }}</h2><p>Ele vale por 1 hora. Se não foi você, ignore este e-mail.</p>`
+   - **Confirm signup** (primeiro acesso). Assunto: `Confirme seu e-mail na Lash Empresária`. Corpo: `<p>Falta só um passo para usar a Lash Empresária.</p><p><a href="{{ .ConfirmationURL }}">Confirmar meu e-mail</a></p><p>Se não foi você, ignore este e-mail.</p>`
+   - **Reset Password** (esqueci minha senha). Assunto: `Crie sua nova senha da Lash Empresária`. Corpo: `<p>Recebemos um pedido para trocar sua senha.</p><p><a href="{{ .ConfirmationURL }}">Criar nova senha</a></p><p>Se não foi você, ignore este e-mail.</p>`
 
-5. Em **Authentication → URL Configuration**, coloque o endereço do app em **Site URL**.
+5. Em **Authentication → URL Configuration**, coloque o endereço do app em **Site URL** e também em **Redirect URLs**. É para lá que os links dos e-mails levam.
 6. Em **Project Settings → API**, copie: **Project URL**, a chave **anon public** e a chave **service_role** (essa é secreta).
 
-## 2. E-mail com o código (Resend)
+## 2. E-mails de confirmação e de nova senha (Resend)
 
 O e-mail padrão do Supabase só envia para os membros do projeto e poucas vezes por hora. Serve para você testar com o seu e-mail, mas não para as compradoras. Para o lançamento:
 
@@ -58,7 +58,7 @@ Depois, em **Deployments**, clique nos três pontinhos do último deploy e em **
 ## 5. Testar antes de abrir o carrinho
 
 1. Na tela do webhook da Hotmart, use o envio de teste. No Supabase, em **Table Editor → acessos**, deve aparecer uma linha.
-2. Faça uma compra real de teste com o seu e-mail, entre no app com o código e confira a data de vencimento no rodapé da aba Preços.
+2. Faça uma compra real de teste com o seu e-mail. No app, toque em **Primeiro acesso**, crie a senha, confirme pelo e-mail, entre e confira a data de vencimento no rodapé da aba Preços.
 3. Peça o reembolso dessa compra: ao reabrir o app, ele deve mostrar "Não achamos sua compra".
 
 ## Liberar acesso sem compra (esposa, betas, cortesias)
@@ -76,5 +76,5 @@ Deixe `vence_em` vazio. Para tirar o acesso, mude `status` para `cancelado`.
 ## Como funciona
 
 - `api/hotmart.ts` recebe o aviso da Hotmart, confere o Hottok e grava em `acessos`: compra aprovada libera (anual = 365 dias a partir da compra; a renovação soma a partir do vencimento atual), reembolso e chargeback revogam aquela compra. Uma compra anual nunca rebaixa quem já é vitalícia.
-- O app entra com um código de 6 dígitos enviado por e-mail (Supabase Auth). A compradora só lê a própria linha de `acessos`.
+- A compradora entra com e-mail e senha (Supabase Auth). No primeiro acesso ela cria a senha e confirma o e-mail uma vez; se esquecer, recebe um link para criar outra. O aparelho fica conectado. A compradora só lê a própria linha de `acessos`.
 - Os números da calculadora ficam no celular e também na tabela `calculadoras`, ligada à conta. Ao entrar em outro aparelho, os dados da conta substituem os do aparelho.

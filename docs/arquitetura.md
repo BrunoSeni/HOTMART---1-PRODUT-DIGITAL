@@ -8,7 +8,7 @@ Hoje o produto é só a calculadora. Este documento registra como a base atual j
 | --- | --- | --- |
 | `lashempresaria.com.br` | Site de vendas: página do produto, inscrição do semente, depoimentos | Vercel (projeto separado ou página estática) |
 | `app.lashempresaria.com.br` | O app da compradora: calculadora hoje, agenda depois | Vercel, este repositório |
-| `acesso@lashempresaria.com.br` | Remetente do e-mail com o código de login | Resend |
+| `acesso@lashempresaria.com.br` | Remetente dos e-mails de confirmação e de nova senha | Resend |
 
 O domínio exato depende da checagem da LP-48.
 

@@ -45,6 +45,8 @@ async function verificar(sessao: Session | null): Promise<Situacao> {
 export function useAcesso() {
   const [estado, setEstado] = useState<Situacao>({ tipo: 'carregando' });
   const [erro, setErro] = useState(false);
+  // veio do link "esqueci minha senha": antes de tudo, ela cria a senha nova
+  const [novaSenha, setNovaSenha] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -60,23 +62,45 @@ export function useAcesso() {
     supabase.auth.getSession().then(({ data }) => atualizar(data.session));
     // o Supabase pede que a callback não espere outras chamadas dele; por isso o setTimeout
     const { data } = supabase.auth.onAuthStateChange((evento, sessao) => {
+      if (evento === 'PASSWORD_RECOVERY') setNovaSenha(true);
       if (evento === 'SIGNED_IN' || evento === 'SIGNED_OUT') setTimeout(() => atualizar(sessao), 0);
     });
     return () => data.subscription.unsubscribe();
   }, []);
 
-  return { situacao: estado, erro };
+  return { situacao: estado, erro, novaSenha, senhaDefinida: () => setNovaSenha(false) };
 }
 
-export async function enviarCodigo(email: string) {
+const normalizar = (email: string) => email.trim().toLowerCase();
+// os links dos e-mails (confirmação e nova senha) voltam para o próprio app
+const voltarPara = () => window.location.origin;
+
+export async function entrar(email: string, senha: string) {
   if (!supabase) return;
-  const { error } = await supabase.auth.signInWithOtp({ email: email.trim().toLowerCase() });
+  const { error } = await supabase.auth.signInWithPassword({ email: normalizar(email), password: senha });
   if (error) throw error;
 }
 
-export async function confirmarCodigo(email: string, codigo: string) {
+/** Primeiro acesso: cria a conta e manda um e-mail de confirmação, só desta vez. */
+export async function criarConta(email: string, senha: string) {
   if (!supabase) return;
-  const { error } = await supabase.auth.verifyOtp({ email: email.trim().toLowerCase(), token: codigo.trim(), type: 'email' });
+  const { error } = await supabase.auth.signUp({
+    email: normalizar(email),
+    password: senha,
+    options: { emailRedirectTo: voltarPara() },
+  });
+  if (error) throw error;
+}
+
+export async function recuperarSenha(email: string) {
+  if (!supabase) return;
+  const { error } = await supabase.auth.resetPasswordForEmail(normalizar(email), { redirectTo: voltarPara() });
+  if (error) throw error;
+}
+
+export async function trocarSenha(senha: string) {
+  if (!supabase) return;
+  const { error } = await supabase.auth.updateUser({ password: senha });
   if (error) throw error;
 }
 

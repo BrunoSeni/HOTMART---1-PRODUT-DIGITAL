@@ -14,7 +14,7 @@ O app abre com os números da planilha original como exemplo.
 
 ## Acesso pago
 
-Só entra quem comprou na Hotmart: login com código por e-mail (Supabase Auth), liberação pelo webhook da Hotmart (`api/hotmart.ts`) e dados da calculadora salvos na conta. Sem as variáveis do Supabase, o app abre sem login. Configuração passo a passo em [`docs/configurar-acesso.md`](docs/configurar-acesso.md).
+Só entra quem comprou na Hotmart: login com e-mail e senha (Supabase Auth), liberação pelo webhook da Hotmart (`api/hotmart.ts`) e dados da calculadora salvos na conta. Sem as variáveis do Supabase, o app abre sem login. Configuração passo a passo em [`docs/configurar-acesso.md`](docs/configurar-acesso.md).
 
 ## Regras de cálculo
 

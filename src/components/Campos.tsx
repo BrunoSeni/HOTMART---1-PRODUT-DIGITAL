@@ -65,13 +65,14 @@ interface CampoTextoProps {
   valor: string;
   aoMudar: (t: string) => void;
   placeholder?: string;
-  tipo?: 'texto' | 'email' | 'codigo';
+  tipo?: 'texto' | 'email' | 'senha' | 'nova-senha';
 }
 
 const TECLADO = {
   texto: {},
   email: { type: 'email', inputMode: 'email', autoComplete: 'email', autoCapitalize: 'none' },
-  codigo: { inputMode: 'numeric', autoComplete: 'one-time-code', maxLength: 8 },
+  senha: { type: 'password', autoComplete: 'current-password' },
+  'nova-senha': { type: 'password', autoComplete: 'new-password', minLength: 8 },
 } as const;
 
 export function CampoTexto({ rotulo, valor, aoMudar, placeholder, tipo = 'texto' }: CampoTextoProps) {
