@@ -66,6 +66,7 @@ Depois, em **Deployments**, clique nos três pontinhos do último deploy e em **
 No Supabase, em **Table Editor → acessos → Insert row**:
 
 - `email`: o e-mail da pessoa, em minúsculas
+- `produto`: `calculadora`
 - `plano`: `vitalicio`
 - `status`: `ativo`
 - `transacao`: `cortesia`

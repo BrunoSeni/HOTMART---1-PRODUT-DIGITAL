@@ -1,15 +1,18 @@
 -- Lash Empresária: tabelas do acesso pago.
 -- Rodar uma vez no Supabase: SQL Editor > New query > colar > Run.
 
--- Quem comprou. Escrita só pelo webhook da Hotmart (api/hotmart.ts, com a chave service_role).
+-- Quem comprou o quê. Escrita só pelo webhook da Hotmart (api/hotmart.ts, com a chave service_role).
+-- Uma linha por e-mail e produto: hoje só 'calculadora'; a agenda futura entra como outro produto.
 create table if not exists public.acessos (
-  email         text primary key,             -- sempre em minúsculas
+  email         text not null,                -- sempre em minúsculas
+  produto       text not null default 'calculadora',
   nome          text,
   plano         text not null check (plano in ('anual', 'vitalicio')),
   status        text not null check (status in ('ativo', 'reembolsado', 'cancelado')),
   vence_em      timestamptz,                  -- null no vitalício
   transacao     text not null,                -- código da compra na Hotmart (HP...)
-  atualizado_em timestamptz not null default now()
+  atualizado_em timestamptz not null default now(),
+  primary key (email, produto)
 );
 
 alter table public.acessos enable row level security;

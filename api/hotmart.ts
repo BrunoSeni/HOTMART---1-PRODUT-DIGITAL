@@ -10,11 +10,16 @@
 import { timingSafeEqual } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 
+// Cada produto vendido (hoje só a calculadora; no futuro, a agenda) tem sua própria
+// linha em `acessos`. Quando houver mais de um, o produto virá do id da Hotmart.
+export const PRODUTO = 'calculadora';
+
 export type Plano = 'anual' | 'vitalicio';
 export type Status = 'ativo' | 'reembolsado' | 'cancelado';
 
 export interface Acesso {
   email: string;
+  produto: string;
   nome: string | null;
   plano: Plano;
   status: Status;
@@ -93,6 +98,7 @@ export function combinar(atual: Acesso | null, mudanca: Mudanca): Acesso | null 
 
   return {
     email: mudanca.email,
+    produto: PRODUTO,
     nome: mudanca.nome ?? atual?.nome ?? null,
     plano: mudanca.plano,
     status: 'ativo',
@@ -135,8 +141,9 @@ export async function POST(request: Request): Promise<Response> {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
   const { data: atual, error: erroLeitura } = await supabase
     .from('acessos')
-    .select('email, nome, plano, status, vence_em, transacao')
+    .select('email, produto, nome, plano, status, vence_em, transacao')
     .eq('email', mudanca.email)
+    .eq('produto', PRODUTO)
     .maybeSingle<Acesso>();
   // erro devolve 500 para a Hotmart tentar de novo mais tarde
   if (erroLeitura) return resposta(500, { erro: erroLeitura.message });
@@ -144,7 +151,7 @@ export async function POST(request: Request): Promise<Response> {
   const nova = combinar(atual, mudanca);
   if (!nova) return resposta(200, { ok: true, semMudanca: true });
 
-  const { error } = await supabase.from('acessos').upsert({ ...nova, atualizado_em: new Date().toISOString() });
+  const { error } = await supabase.from('acessos').upsert({ ...nova, atualizado_em: new Date().toISOString() }, { onConflict: 'email,produto' });
   if (error) return resposta(500, { erro: error.message });
   return resposta(200, { ok: true, status: nova.status });
 }

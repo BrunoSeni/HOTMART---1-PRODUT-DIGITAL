@@ -36,6 +36,7 @@ async function verificar(sessao: Session | null): Promise<Situacao> {
   const { data, error } = await supabase
     .from('acessos')
     .select('plano, status, vence_em')
+    .eq('produto', 'calculadora')
     .maybeSingle<Acesso>();
   if (error) throw error;
   return situacao(sessao.user.email, sessao.user.id, data);

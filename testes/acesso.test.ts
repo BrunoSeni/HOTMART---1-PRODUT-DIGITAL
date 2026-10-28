@@ -17,6 +17,7 @@ function evento(event: string, extra: { transacao?: string; oferta?: string; ema
 
 const anualAtivo: Acesso = {
   email: 'maria@email.com',
+  produto: 'calculadora',
   nome: 'Maria',
   plano: 'anual',
   status: 'ativo',
