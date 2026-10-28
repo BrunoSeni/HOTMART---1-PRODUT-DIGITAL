@@ -65,9 +65,16 @@ interface CampoTextoProps {
   valor: string;
   aoMudar: (t: string) => void;
   placeholder?: string;
+  tipo?: 'texto' | 'email' | 'codigo';
 }
 
-export function CampoTexto({ rotulo, valor, aoMudar, placeholder }: CampoTextoProps) {
+const TECLADO = {
+  texto: {},
+  email: { type: 'email', inputMode: 'email', autoComplete: 'email', autoCapitalize: 'none' },
+  codigo: { inputMode: 'numeric', autoComplete: 'one-time-code', maxLength: 8 },
+} as const;
+
+export function CampoTexto({ rotulo, valor, aoMudar, placeholder, tipo = 'texto' }: CampoTextoProps) {
   const id = useId();
   return (
     <div className="campo">
@@ -75,7 +82,7 @@ export function CampoTexto({ rotulo, valor, aoMudar, placeholder }: CampoTextoPr
         {rotulo}
       </label>
       <div className="entrada">
-        <input id={id} value={valor} placeholder={placeholder} onChange={(e) => aoMudar(e.target.value)} />
+        <input id={id} {...TECLADO[tipo]} value={valor} placeholder={placeholder} onChange={(e) => aoMudar(e.target.value)} />
       </div>
     </div>
   );

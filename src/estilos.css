@@ -82,6 +82,9 @@ input {
   background: var(--surface);
   padding-bottom: calc(var(--abas-altura) + env(safe-area-inset-bottom, 0px));
 }
+.app--sem-abas {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
 
 /* Assinatura */
 .marca {
@@ -182,6 +185,9 @@ input {
   font-size: 13px;
   line-height: 18px;
   color: var(--ink-muted);
+}
+.ajuda a {
+  color: var(--ink);
 }
 .ajuda--inversa {
   color: var(--on-action);
@@ -409,6 +415,15 @@ input {
   color: var(--on-action);
   border: 1px solid var(--action);
 }
+a.botao {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+.botao:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 .botao--secundario {
   background: transparent;
   color: var(--ink);
@@ -462,6 +477,21 @@ input {
 }
 .vazio p {
   margin: 0;
+}
+
+.conta {
+  margin-top: var(--space-5);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+.conta .link-discreto {
+  margin-top: 0;
 }
 
 /* Navegação inferior */
