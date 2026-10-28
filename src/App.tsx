@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { calcular, type Dados } from './lib/calculo';
-import { useEstado } from './lib/armazenamento';
+import { useEstado, useSincronizar } from './lib/armazenamento';
+import { sair, type Situacao } from './lib/acesso';
 import { DADOS_EXEMPLO, DADOS_VAZIOS } from './lib/exemplo';
 import { Resultado } from './telas/Resultado';
 import { Rotina } from './telas/Rotina';
@@ -18,8 +19,11 @@ const ABAS: { id: Aba; rotulo: string }[] = [
   { id: 'procedimentos', rotulo: 'Proced.' },
 ];
 
-export function App() {
+type Conta = Extract<Situacao, { tipo: 'liberado' }>;
+
+export function App({ conta }: { conta?: Conta }) {
   const [estado, setEstado] = useEstado();
+  useSincronizar(estado, setEstado, conta?.userId ?? null);
   const [aba, setAba] = useState<Aba>('precos');
   const resumo = useMemo(() => calcular(estado.dados), [estado.dados]);
 
@@ -82,6 +86,19 @@ export function App() {
           >
             Ver o exemplo de novo (apaga seus dados)
           </button>
+        )}
+
+        {conta && aba === 'precos' && (
+          <footer className="conta">
+            <span>
+              {conta.email}
+              <br />
+              {conta.venceEm ? `Acesso até ${conta.venceEm.toLocaleDateString('pt-BR')}` : 'Acesso vitalício'}
+            </span>
+            <button className="link-discreto" onClick={() => sair()}>
+              Sair
+            </button>
+          </footer>
         )}
       </main>
 
