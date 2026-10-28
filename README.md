@@ -30,3 +30,9 @@ npm run dev     # desenvolvimento
 npm test        # testes do cálculo
 npm run build   # versão para publicar (pasta dist/)
 ```
+
+## Como trabalhamos
+
+- `main` é o branch principal: o que está nele é o que vai para o ar.
+- Toda mudança entra por pull request, com o número da tarefa do Jira (projeto LP).
+- A verificação automática (GitHub Actions) roda os testes e o build em cada PR.
